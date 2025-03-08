@@ -22,6 +22,8 @@ async function fetchMarketData() {
     const locations = ["Bridgewatch", "Martlock", "Lymhurst", "Thetford", "Fort Sterling"];
     const taxRate = document.getElementById("taxCheckbox").checked ? 0.04 : 0.08; // ✅ 4% sau 8%
     const setupFee = 0.025; // ✅ 2.5% setup fee
+
+    const url = 'https://europe.albion-online-data.com' //the site with the API for EU
     
     try {
         const response = await fetch(url);
