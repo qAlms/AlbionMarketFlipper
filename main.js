@@ -1,7 +1,7 @@
 async function fetchMarketData() {
     let itemsInput = document.getElementById("itemInput").value.trim();
     
-    // Înlocuim spațiile cu "_", pentru a ne asigura că itemele cu mai multe cuvinte sunt corect procesate
+    // Împărțim itemele introduse pe virgule și înlocuim spațiile cu "_"
     const items = itemsInput.split(",").map(item => item.trim().replace(/ /g, "_"));
 
     if (items.length === 0 || items.some(item => !item)) {
@@ -16,86 +16,103 @@ async function fetchMarketData() {
     try {
         let marketData = [];
         
-        // Loop through all items and fetch their market data
         for (const itemId of items) {
             const url = `https://www.albion-online-data.com/api/v2/stats/prices/${itemId}.json?locations=${locations.join(",")}`;
-            
+
+            console.log(`Fetching data for: ${itemId}`); // Debugging: Afișează itemId
+
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log(`🔍 API Response for ${itemId}:`, data);
-
-            if (data.length === 0) {
-                alert(`⚠️ No market data found for item ID: ${itemId}. Try another item.`);
+                console.error(`HTTP error for ${itemId}. Status: ${response.status}`);
+                alert(`⚠️ Failed to fetch data for item: ${itemId}`);
                 continue;
             }
 
-            let minSell = Infinity, maxSell = 0;
-            let minCity = "N/A", maxCity = "N/A";
+            const data = await response.json();
+            console.log(`🔍 API Response for ${itemId}:`, data); // Debugging: Afișează răspunsul de la API
 
+            if (data.length === 0) {
+                console.warn(`No data found for ${itemId}`);
+                continue;
+            }
+
+            let cityPrices = [];
+
+            // Salvăm prețurile pentru fiecare oraș
             locations.forEach(city => {
                 const cityData = data.filter(d => d.city === city);
                 const sellOrders = cityData.filter(d => d.sell_price_min > 0);
 
                 if (sellOrders.length > 0) {
                     const cityMinSell = Math.min(...sellOrders.map(d => d.sell_price_min));
-
-                    if (cityMinSell < minSell) {
-                        minSell = cityMinSell;
-                        minCity = city;
-                    }
-
-                    if (cityMinSell > maxSell) {
-                        maxSell = cityMinSell;
-                        maxCity = city;
-                    }
+                    cityPrices.push({ city, price: cityMinSell });
                 }
             });
 
-            marketData.push({ itemId, minCity, minSell, maxCity, maxSell });
+            // Calculăm toate flip-urile posibile
+            let profitableFlips = [];
+
+            for (let buy of cityPrices) {
+                for (let sell of cityPrices) {
+                    if (buy.city !== sell.city && sell.price > buy.price) {
+                        const sellAfterSetup = sell.price * (1 - setupFee);
+                        const finalSellPrice = sellAfterSetup * (1 - taxRate);
+                        const profit = (finalSellPrice - buy.price).toFixed(2);
+
+                        profitableFlips.push({
+                            itemId,
+                            buyCity: buy.city,
+                            buyPrice: buy.price,
+                            sellCity: sell.city,
+                            sellPrice: sell.price,
+                            profit
+                        });
+                    }
+                }
+            }
+
+            marketData.push(...profitableFlips);
         }
 
-        displayData(marketData, taxRate, setupFee);
+        if (marketData.length === 0) {
+            alert("⚠️ No profitable flips found.");
+        } else {
+            displayData(marketData);
+        }
+
     } catch (error) {
         console.error("❌ Error fetching data:", error);
         alert("⚠️ Failed to fetch data. Check the item IDs and try again.");
     }
 }
 
-function displayData(marketData, taxRate, setupFee) {
+function displayData(marketData) {
     const table = document.getElementById("marketTable");
-    table.innerHTML = "<tr><th>Item</th><th>Buy From</th><th>Min Sell</th><th>Sell To</th><th>Max Sell</th><th>Profit</th></tr>";
+    table.innerHTML = "<tr><th>Item</th><th>Buy From</th><th>Buy Price</th><th>Sell To</th><th>Sell Price</th><th>Profit</th></tr>";
 
-    marketData.forEach(({ itemId, minCity, minSell, maxCity, maxSell }) => {
-        let profit = "N/A";
-        
-        if (maxSell > minSell && minCity !== maxCity) {
-            const sellAfterSetup = maxSell * (1 - setupFee);
-            const finalSellPrice = sellAfterSetup * (1 - taxRate);
-            profit = (finalSellPrice - minSell).toFixed(2);
-        }
-
-        table.innerHTML += `
-            <tr>
-                <td>${itemId}</td>
-                <td>${minCity} (${minSell})</td>
-                <td>${minSell}</td>
-                <td>${maxCity} (${maxSell})</td>
-                <td>${maxSell}</td>
-                <td>${profit}</td>
-            </tr>
-        `;
-    });
+    if (marketData.length === 0) {
+        table.innerHTML += "<tr><td colspan='6'>No profitable flips available</td></tr>";
+    } else {
+        marketData.forEach(({ itemId, buyCity, buyPrice, sellCity, sellPrice, profit }) => {
+            table.innerHTML += `
+                <tr>
+                    <td>${itemId}</td>
+                    <td>${buyCity}</td>
+                    <td>${buyPrice}</td>
+                    <td>${sellCity}</td>
+                    <td>${sellPrice}</td>
+                    <td>${profit}</td>
+                </tr>
+            `;
+        });
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    const balls = document.getElementById("btn1");
+    const button = document.getElementById("btn1");
 
-    if (balls) {
-        balls.addEventListener("click", fetchMarketData);
+    if (button) {
+        button.addEventListener("click", fetchMarketData);
     } else {
         console.error("Button with id 'btn1' not found.");
     }
