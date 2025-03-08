@@ -8,7 +8,7 @@
         async function fetchMarketData() {
             const itemId = document.getElementById("itemInput").value;
             const locations = ["Bridgewatch", "Martlock", "Lymhurst", "Thetford", "Fort Sterling"];
-            const taxRate = document.getElementById("taxCheckbox").checked ? 0.04 : 0.08;
+            const taxRate = document.getElementById("taxCheckbox").checked ? 0.04 : 0.08; // ✅ Aplică taxa corect
 
             if (!itemId) {
                 alert("Please enter an item ID.");
@@ -84,15 +84,17 @@
 </head>
 <body>
     <h1>Albion Market Flipper</h1>
+    
     <label for="itemInput">Enter Item ID:</label>
     <input type="text" id="itemInput" placeholder="e.g., T4_BAG">
     <br><br>
-    
+
+    <input type="checkbox" id="taxCheckbox"> 
     <label for="taxCheckbox">Use 4% tax (otherwise 8%)</label>
-    <input type="checkbox" id="taxCheckbox">
     <br><br>
 
     <button onclick="fetchMarketData()">Get Prices</button>
+    
     <table border="1" id="marketTable"></table>
 </body>
 </html>
