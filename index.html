@@ -25,13 +25,10 @@
                 const marketData = locations.map(city => {
                     const cityData = data.filter(d => d.city === city);
                     const sellOrder = cityData.find(d => d.sell_price_min > 0);
-                    const buyOrder = cityData.find(d => d.buy_price_max > 0);
                     
                     return {
                         city,
-                        sellPrice: sellOrder ? sellOrder.sell_price_min : "N/A",
-                        buyPrice: buyOrder ? buyOrder.buy_price_max : "N/A",
-                        profit: sellOrder && buyOrder ? (sellOrder.sell_price_min * 0.975 - buyOrder.buy_price_max).toFixed(2) : "N/A"
+                        sellPrice: sellOrder ? sellOrder.sell_price_min : "N/A"
                     };
                 });
                 
@@ -44,9 +41,9 @@
         
         function displayData(data) {
             const table = document.getElementById("marketTable");
-            table.innerHTML = "<tr><th>City</th><th>Buy Price</th><th>Sell Price</th><th>Profit</th></tr>";
+            table.innerHTML = "<tr><th>City</th><th>Sell Price</th></tr>";
             data.forEach(row => {
-                table.innerHTML += `<tr><td>${row.city}</td><td>${row.buyPrice}</td><td>${row.sellPrice}</td><td>${row.profit}</td></tr>`;
+                table.innerHTML += `<tr><td>${row.city}</td><td>${row.sellPrice}</td></tr>`;
             });
         }
     </script>
@@ -59,3 +56,4 @@
     <table border="1" id="marketTable"></table>
 </body>
 </html>
+
