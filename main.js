@@ -76,9 +76,9 @@ async function fetchMarketData() {
     }
 }
 
-const btnFor = document.getElementByID("btn1");
+const balls = document.getElementByID("btn1");
 
-btnFor.addEventListener("click", fetchMarketData());
+balls.addEventListener("click", fetchMarketData());
 
 function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
     const table = document.getElementById("marketTable");
