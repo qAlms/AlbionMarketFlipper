@@ -159,24 +159,3 @@ async function fetchMarketData() {
             }
         }
 
-        function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
-            const table = document.getElementById("marketTable");
-            table.innerHTML = "<tr><th>City</th><th>Sell Order</th></tr>";
-
-            // Afișăm datele pentru fiecare oraș
-            data.forEach(row => {
-                table.innerHTML += `<tr><td>${row.city}</td><td>${row.sellOrder}</td></tr>`;
-            });
-
-            // Verificăm dacă există profitabilitate
-            if (profit !== "N/A") {
-                table.innerHTML += `<tr><th colspan="2">Best Transport Opportunity</th></tr>`;
-                table.innerHTML += `<tr><td>Buy From</td><td>${minCity} (${minSell})</td></tr>`;
-                table.innerHTML += `<tr><td>Sell To</td><td>${maxCity} (${maxSell})</td></tr>`;
-                table.innerHTML += `<tr><td>Setup Fee</td><td>2.5%</td></tr>`;
-                table.innerHTML += `<tr><td>Tax Applied</td><td>${(taxRate * 100).toFixed(0)}%</td></tr>`;
-                table.innerHTML += `<tr><td>Profit</td><td>${profit}</td></tr>`;
-            } else {
-                table.innerHTML += `<tr><td colspan="2">No profitable transport found</td></tr>`;
-            }
-        }
