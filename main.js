@@ -1,6 +1,6 @@
 async function fetchMarketData() {
     const itemId = document.getElementById("itemInput").value.trim();
-    itemId = itemId.replace(/ /g, "_");
+    itemId = itemId.replace(/ /g, "_"); // Înlocuiește spațiile cu "_"
 
     if (!itemId) {
         alert("⚠️ Please enter an item ID.");
@@ -12,61 +12,51 @@ async function fetchMarketData() {
     const setupFee = 0.025; // ✅ 2.5% setup fee
 
     try {
-        // Înlocuiește fetch-ul API cu citirea fișierului JSON local
-        const response = await fetch('data/market_prices.json'); // Calea către fișierul JSON
+        // Apelăm API-ul Albion Online pentru a obține datele pentru itemul selectat
+        const response = await fetch(`https://europe.albion-online-data.com/api/v2/stats/prices/${itemId}.json`);
         if (!response.ok) {
-            throw new Error(`Failed to load data from JSON file: ${response.status}`);
+            throw new Error(`Failed to fetch data for item ${itemId}`);
         }
+
         const data = await response.json();
 
-        if (!(itemId in data)) {
+        if (data.length === 0) {
             alert(`⚠️ No market data found for item ID: ${itemId}. Try another item.`);
             return;
         }
 
-        const itemData = data[itemId];
         let minSell = Infinity, maxSell = 0;
         let minCity = "N/A", maxCity = "N/A";
         let marketData = [];
 
-        locations.forEach(city => {
-            const cityData = itemData.filter(d => d.city === city);
-            const sellOrders = cityData.filter(d => d.sell_price_min > 0);
+        // Iterăm prin datele primite și calculăm cele mai mici și cele mai mari prețuri de vânzare
+        data.forEach(entry => {
+            const { city, sell_price_min, buy_price_max } = entry;
 
-            if (sellOrders.length > 0) {
-                const cityMinSell = Math.min(...sellOrders.map(d => d.sell_price_min));
-
-                if (cityMinSell < minSell) {
-                    minSell = cityMinSell;
-                    minCity = city;
-                }
-
-                if (cityMinSell > maxSell) {
-                    maxSell = cityMinSell;
-                    maxCity = city;
-                }
-
-                marketData.push({ city, sellOrder: cityMinSell });
-            } else {
-                marketData.push({ city, sellOrder: "N/A (No sell orders)" });
+            if (sell_price_min > maxSell) {
+                maxSell = sell_price_min;
+                maxCity = city;
             }
+
+            if (sell_price_min < minSell) {
+                minSell = sell_price_min;
+                minCity = city;
+            }
+
+            marketData.push({ city, sellOrder: sell_price_min, buyOrder: buy_price_max });
         });
 
-        // Verificăm dacă există o oportunitate de transport profitabilă
-        if (maxSell > minSell && minCity !== maxCity) {
-            const sellAfterSetup = maxSell * (1 - setupFee);
-            const finalSellPrice = sellAfterSetup * (1 - taxRate);
-            const profit = (finalSellPrice - minSell).toFixed(2);
+        // Calculează profitul
+        const sellAfterSetup = maxSell * (1 - setupFee);
+        const finalSellPrice = sellAfterSetup * (1 - taxRate);
+        const profit = (finalSellPrice - minSell).toFixed(2);
 
-            displayData(marketData, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee);
-        } else {
-            displayData(marketData, "N/A", minCity, minSell, maxCity, maxSell, taxRate, setupFee);
-        }
+        displayData(marketData, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee);
     } catch (error) {
         console.error("❌ Error loading data:", error);
         alert("⚠️ Failed to load data. Check the item ID and try again.");
     }
-};
+}
         function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
             const table = document.getElementById("marketTable");
             table.innerHTML = "<tr><th>City</th><th>Sell Order</th></tr>";
