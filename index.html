@@ -36,14 +36,16 @@
                     }
                     
                     const cityMinSell = Math.min(...sellOrders.map(d => d.sell_price_min));
-                    const cityMaxSell = Math.max(...sellOrders.map(d => d.sell_price_min));
                     
+                    // Caut cel mai mic preț global și unde e
                     if (cityMinSell < minSell) {
                         minSell = cityMinSell;
                         minCity = city;
                     }
-                    if (cityMaxSell > maxSell) {
-                        maxSell = cityMaxSell;
+                    
+                    // Caut cel mai mare preț global și unde e
+                    if (cityMinSell > maxSell) {
+                        maxSell = cityMinSell;
                         maxCity = city;
                     }
 
@@ -52,24 +54,28 @@
 
                 const profit = maxSell > minSell ? (maxSell - minSell).toFixed(2) : "N/A";
                 
-                displayData(marketData, profit, minCity, maxCity);
+                displayData(marketData, profit, minCity, minSell, maxCity, maxSell);
             } catch (error) {
                 console.error("Error fetching data:", error);
                 alert("Failed to fetch data. Check the item ID and try again.");
             }
         }
         
-        function displayData(data, profit, minCity, maxCity) {
+        function displayData(data, profit, minCity, minSell, maxCity, maxSell) {
             const table = document.getElementById("marketTable");
             table.innerHTML = "<tr><th>City</th><th>Sell Order</th></tr>";
             data.forEach(row => {
                 table.innerHTML += `<tr><td>${row.city}</td><td>${row.sellOrder}</td></tr>`;
             });
 
-            table.innerHTML += `<tr><th colspan="2">Best Transport Opportunity</th></tr>`;
-            table.innerHTML += `<tr><td>Buy From</td><td>${minCity} (${minSell})</td></tr>`;
-            table.innerHTML += `<tr><td>Sell To</td><td>${maxCity} (${maxSell})</td></tr>`;
-            table.innerHTML += `<tr><td>Profit</td><td>${profit}</td></tr>`;
+            if (profit !== "N/A") {
+                table.innerHTML += `<tr><th colspan="2">Best Transport Opportunity</th></tr>`;
+                table.innerHTML += `<tr><td>Buy From</td><td>${minCity} (${minSell})</td></tr>`;
+                table.innerHTML += `<tr><td>Sell To</td><td>${maxCity} (${maxSell})</td></tr>`;
+                table.innerHTML += `<tr><td>Profit</td><td>${profit}</td></tr>`;
+            } else {
+                table.innerHTML += `<tr><td colspan="2">No profitable transport found</td></tr>`;
+            }
         }
     </script>
 </head>
