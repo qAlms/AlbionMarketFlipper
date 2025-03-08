@@ -8,7 +8,8 @@
         async function fetchMarketData() {
             const itemId = document.getElementById("itemInput").value;
             const locations = ["Bridgewatch", "Martlock", "Lymhurst", "Thetford", "Fort Sterling"];
-            
+            const taxRate = document.getElementById("taxCheckbox").checked ? 0.04 : 0.08;
+
             if (!itemId) {
                 alert("Please enter an item ID.");
                 return;
@@ -33,13 +34,11 @@
                     if (sellOrders.length > 0) {
                         const cityMinSell = Math.min(...sellOrders.map(d => d.sell_price_min));
 
-                        // Caut cel mai mic preț global și unde e
                         if (cityMinSell < minSell) {
                             minSell = cityMinSell;
                             minCity = city;
                         }
 
-                        // Caut cel mai mare preț global și unde e
                         if (cityMinSell > maxSell) {
                             maxSell = cityMinSell;
                             maxCity = city;
@@ -51,16 +50,20 @@
                     }
                 });
 
-                const profit = maxSell > minSell ? (maxSell - minSell).toFixed(2) : "N/A";
-                
-                displayData(marketData, profit, minCity, minSell, maxCity, maxSell);
+                if (maxSell > minSell) {
+                    const profit = ((maxSell * (1 - taxRate)) - minSell).toFixed(2);
+                    displayData(marketData, profit, minCity, minSell, maxCity, maxSell, taxRate);
+                } else {
+                    displayData(marketData, "N/A", minCity, minSell, maxCity, maxSell, taxRate);
+                }
+
             } catch (error) {
                 console.error("Error fetching data:", error);
                 alert("Failed to fetch data. Check the item ID and try again.");
             }
         }
         
-        function displayData(data, profit, minCity, minSell, maxCity, maxSell) {
+        function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate) {
             const table = document.getElementById("marketTable");
             table.innerHTML = "<tr><th>City</th><th>Sell Order</th></tr>";
             data.forEach(row => {
@@ -71,6 +74,7 @@
                 table.innerHTML += `<tr><th colspan="2">Best Transport Opportunity</th></tr>`;
                 table.innerHTML += `<tr><td>Buy From</td><td>${minCity} (${minSell})</td></tr>`;
                 table.innerHTML += `<tr><td>Sell To</td><td>${maxCity} (${maxSell})</td></tr>`;
+                table.innerHTML += `<tr><td>Applied Tax</td><td>${(taxRate * 100).toFixed(0)}%</td></tr>`;
                 table.innerHTML += `<tr><td>Profit</td><td>${profit}</td></tr>`;
             } else {
                 table.innerHTML += `<tr><td colspan="2">No profitable transport found</td></tr>`;
@@ -82,6 +86,12 @@
     <h1>Albion Market Flipper</h1>
     <label for="itemInput">Enter Item ID:</label>
     <input type="text" id="itemInput" placeholder="e.g., T4_BAG">
+    <br><br>
+    
+    <label for="taxCheckbox">Use 4% tax (otherwise 8%)</label>
+    <input type="checkbox" id="taxCheckbox">
+    <br><br>
+
     <button onclick="fetchMarketData()">Get Prices</button>
     <table border="1" id="marketTable"></table>
 </body>
