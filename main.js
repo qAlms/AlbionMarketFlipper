@@ -76,6 +76,10 @@ async function fetchMarketData() {
     }
 }
 
+cosnt btnFor = document.getElementByID("btn1");
+
+btnFor.addEventListener("click", fetchMarketData());
+
 function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
     const table = document.getElementById("marketTable");
     table.innerHTML = "<tr><th>City</th><th>Sell Order</th></tr>";
