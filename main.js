@@ -23,7 +23,7 @@ async function fetchMarketData() {
     const taxRate = document.getElementById("taxCheckbox").checked ? 0.04 : 0.08; // ✅ 4% sau 8%
     const setupFee = 0.025; // ✅ 2.5% setup fee
 
-    const url = 'europe/api/v2/stats/Prices/${items}.json?' //the site with the API for EU
+    const url = `https://www.albion-online-data.com/api/v2/stats/prices/${itemId}.json?locations=${locations.join(",")}`;
     
     try {
         const response = await fetch(url);
