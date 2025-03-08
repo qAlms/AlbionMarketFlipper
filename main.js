@@ -74,7 +74,7 @@ async function fetchMarketData() {
     }
 }
 
-const balls = document.getElementByID("btn1");
+const balls = document.getElementById("btn1");
 
 balls.addEventListener("click", fetchMarketData());
 
