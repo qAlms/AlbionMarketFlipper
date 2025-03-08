@@ -14,7 +14,7 @@
                 return;
             }
             
-            const url = `https://www.albion-online-data.com/api/v2/stats/prices/${itemId}.json?locations=${locations.join(",")}`;
+            const url = `https://europe.albion-online-data.com/api/v2/stats/prices/${itemId}.json?locations=${locations.join(",")}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
