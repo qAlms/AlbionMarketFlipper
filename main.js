@@ -8,10 +8,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-
 async function fetchMarketData() {
     let itemId = document.getElementById("itemInput").value.trim();
-    
+
     // Înlocuim spațiile cu "_", pentru a ne asigura că itemele cu mai multe cuvinte sunt corect procesate
     itemId = itemId.replace(/ /g, "_");
 
@@ -84,8 +83,6 @@ async function fetchMarketData() {
         alert("⚠️ Failed to fetch data. Check the item ID and try again.");
     }
 }
-
-balls.addEventListener("submit", fetchMarketData);
 
 function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
     const table = document.getElementById("marketTable");
