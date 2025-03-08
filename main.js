@@ -76,7 +76,7 @@ async function fetchMarketData() {
 
 const balls = document.getElementById("btn1");
 
-balls.addEventListener("click", fetchMarketData());
+balls.addEventListener("submit", fetchMarketData());
 
 function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
     const table = document.getElementById("marketTable");
