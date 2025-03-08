@@ -8,7 +8,8 @@
         async function fetchMarketData() {
             const itemId = document.getElementById("itemInput").value;
             const locations = ["Bridgewatch", "Martlock", "Lymhurst", "Thetford", "Fort Sterling"];
-            const taxRate = document.getElementById("taxCheckbox").checked ? 0.04 : 0.08; // ✅ Aplică taxa corect
+            const taxRate = document.getElementById("taxCheckbox").checked ? 0.04 : 0.08; // ✅ 4% sau 8%
+            const setupFee = 0.025; // ✅ 2.5% setup fee
 
             if (!itemId) {
                 alert("Please enter an item ID.");
@@ -51,7 +52,8 @@
                 });
 
                 if (maxSell > minSell) {
-                    const profit = ((maxSell * (1 - taxRate)) - minSell).toFixed(2);
+                    const finalSellPrice = maxSell * (1 - setupFee) * (1 - taxRate); // ✅ Aplicăm setup fee și taxă
+                    const profit = (finalSellPrice - minSell).toFixed(2);
                     displayData(marketData, profit, minCity, minSell, maxCity, maxSell, taxRate);
                 } else {
                     displayData(marketData, "N/A", minCity, minSell, maxCity, maxSell, taxRate);
@@ -74,7 +76,7 @@
                 table.innerHTML += `<tr><th colspan="2">Best Transport Opportunity</th></tr>`;
                 table.innerHTML += `<tr><td>Buy From</td><td>${minCity} (${minSell})</td></tr>`;
                 table.innerHTML += `<tr><td>Sell To</td><td>${maxCity} (${maxSell})</td></tr>`;
-                table.innerHTML += `<tr><td>Applied Tax</td><td>${(taxRate * 100).toFixed(0)}%</td></tr>`;
+                table.innerHTML += `<tr><td>Applied Tax</td><td>${(taxRate * 100).toFixed(0)}% + 2.5% setup fee</td></tr>`;
                 table.innerHTML += `<tr><td>Profit</td><td>${profit}</td></tr>`;
             } else {
                 table.innerHTML += `<tr><td colspan="2">No profitable transport found</td></tr>`;
