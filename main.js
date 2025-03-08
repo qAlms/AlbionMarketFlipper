@@ -1,21 +1,20 @@
 async function fetchMarketData() {
-    let itemsInput = document.getElementById("itemInput").value.trim();
-    
-    // Împărțim itemele introduse pe virgule și înlocuim spațiile cu "_"
-    const items = itemsInput.split(",").map(item => item.trim().replace(/ /g, "_"));
-
-    if (items.length === 0 || items.some(item => !item)) {
-        alert("⚠️ Please enter valid item IDs.");
-        return;
-    }
-
     const locations = ["Bridgewatch", "Martlock", "Lymhurst", "Thetford", "Fort Sterling"];
     const taxRate = document.getElementById("taxCheckbox").checked ? 0.04 : 0.08; // ✅ 4% sau 8%
     const setupFee = 0.025; // ✅ 2.5% setup fee
+    
+    // ✅ Listă prestabilită de iteme populare pentru flipping
+    const items = [
+        "T4_BAG", "T5_BAG", "T6_BAG",
+        "T4_CAPE", "T5_CAPE", "T6_CAPE",
+        "T4_LEATHER_ARMOR_MERCENARY", "T5_LEATHER_ARMOR_MERCENARY",
+        "T4_PLATE_ARMOR_SOLDIER", "T5_PLATE_ARMOR_SOLDIER",
+        "T4_CLOTH_ARMOR_MAGE", "T5_CLOTH_ARMOR_MAGE"
+    ];
 
     try {
         let marketData = [];
-        
+
         for (const itemId of items) {
             const url = `https://www.albion-online-data.com/api/v2/stats/prices/${itemId}.json?locations=${locations.join(",")}`;
 
@@ -24,21 +23,17 @@ async function fetchMarketData() {
             const response = await fetch(url);
             if (!response.ok) {
                 console.error(`HTTP error for ${itemId}. Status: ${response.status}`);
-                alert(`⚠️ Failed to fetch data for item: ${itemId}`);
                 continue;
             }
 
             const data = await response.json();
             console.log(`🔍 API Response for ${itemId}:`, data); // Debugging: Afișează răspunsul de la API
 
-            if (data.length === 0) {
-                console.warn(`No data found for ${itemId}`);
-                continue;
-            }
+            if (data.length === 0) continue;
 
             let cityPrices = [];
 
-            // Salvăm prețurile pentru fiecare oraș
+            // ✅ Salvăm prețurile minime de vânzare pentru fiecare oraș
             locations.forEach(city => {
                 const cityData = data.filter(d => d.city === city);
                 const sellOrders = cityData.filter(d => d.sell_price_min > 0);
@@ -49,7 +44,7 @@ async function fetchMarketData() {
                 }
             });
 
-            // Calculăm toate flip-urile posibile
+            // ✅ Calculăm toate flip-urile posibile
             let profitableFlips = [];
 
             for (let buy of cityPrices) {
@@ -82,7 +77,7 @@ async function fetchMarketData() {
 
     } catch (error) {
         console.error("❌ Error fetching data:", error);
-        alert("⚠️ Failed to fetch data. Check the item IDs and try again.");
+        alert("⚠️ Failed to fetch data.");
     }
 }
 
@@ -108,12 +103,11 @@ function displayData(marketData) {
     }
 }
 
+// ✅ Afișează flip-urile imediat după încărcarea paginii
+document.addEventListener("DOMContentLoaded", fetchMarketData);
+
 document.addEventListener("DOMContentLoaded", function() {
     const button = document.getElementById("btn1");
 
     if (button) {
-        button.addEventListener("click", fetchMarketData);
-    } else {
-        console.error("Button with id 'btn1' not found.");
-    }
-});
+        button.addEvent
