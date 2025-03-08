@@ -61,6 +61,7 @@
                     }
                 });
 
+                // Verificăm dacă există o oportunitate de transport profitabilă
                 if (maxSell > minSell && minCity !== maxCity) {
                     const sellAfterSetup = maxSell * (1 - setupFee);
                     const finalSellPrice = sellAfterSetup * (1 - taxRate);
@@ -80,10 +81,13 @@
         function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
             const table = document.getElementById("marketTable");
             table.innerHTML = "<tr><th>City</th><th>Sell Order</th></tr>";
+
+            // Afișăm datele pentru fiecare oraș
             data.forEach(row => {
                 table.innerHTML += `<tr><td>${row.city}</td><td>${row.sellOrder}</td></tr>`;
             });
 
+            // Verificăm dacă există profitabilitate
             if (profit !== "N/A") {
                 table.innerHTML += `<tr><th colspan="2">Best Transport Opportunity</th></tr>`;
                 table.innerHTML += `<tr><td>Buy From</td><td>${minCity} (${minSell})</td></tr>`;
