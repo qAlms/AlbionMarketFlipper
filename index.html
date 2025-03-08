@@ -29,8 +29,8 @@
                     
                     return {
                         city,
-                        sellPrice: sellOrder ? sellOrder.sell_price_min : "N/A",
-                        buyPrice: buyOrder ? buyOrder.buy_price_max : "N/A",
+                        sellOrder: sellOrder ? sellOrder.sell_price_min : "N/A",
+                        buyOrder: buyOrder ? buyOrder.buy_price_max : "N/A",
                         profit: sellOrder && buyOrder ? (sellOrder.sell_price_min * 0.975 - buyOrder.buy_price_max).toFixed(2) : "N/A"
                     };
                 });
