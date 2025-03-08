@@ -1,6 +1,6 @@
 async function fetchMarketData() {
     const itemId = document.getElementById("itemInput").value.trim();
-    itemId = itemId.replace(/ /g, "_"); // Înlocuiește spațiile cu "_"
+    let itemId = document.getElementById("itemInput").value.trim();
 
     if (!itemId) {
         alert("⚠️ Please enter an item ID.");
