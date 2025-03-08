@@ -24,12 +24,29 @@
                 
                 const marketData = locations.map(city => {
                     const cityData = data.filter(d => d.city === city);
-                    const sellOrder = cityData.find(d => d.sell_price_min > 0);
+                    const sellOrders = cityData.filter(d => d.sell_price_min > 0);
+                    
+                    if (sellOrders.length === 0) {
+                        return {
+                            city,
+                            sellOrder: "N/A",
+                            profit: "N/A",
+                            transportCities: "N/A"
+                        };
+                    }
+                    
+                    const minSell = Math.min(...sellOrders.map(d => d.sell_price_min));
+                    const maxSell = Math.max(...sellOrders.map(d => d.sell_price_min));
+                    const transportCities = sellOrders
+                        .filter(d => d.sell_price_min === maxSell || d.sell_price_min === minSell)
+                        .map(d => d.city)
+                        .join(", ");
                     
                     return {
                         city,
-                        sellOrder: sellOrder ? sellOrder.sell_price_min : "N/A",
-                        profit: sellOrder ? (sellOrder.sell_price_min * 0.975).toFixed(2) : "N/A"
+                        sellOrder: `${minSell} - ${maxSell}`,
+                        profit: (maxSell - minSell).toFixed(2),
+                        transportCities
                     };
                 });
                 
@@ -42,9 +59,9 @@
         
         function displayData(data) {
             const table = document.getElementById("marketTable");
-            table.innerHTML = "<tr><th>City</th><th>Sell Order</th><th>Profit</th></tr>";
+            table.innerHTML = "<tr><th>City</th><th>Sell Order Range</th><th>Profit</th><th>Transport Cities</th></tr>";
             data.forEach(row => {
-                table.innerHTML += `<tr><td>${row.city}</td><td>${row.sellOrder}</td><td>${row.profit}</td></tr>`;
+                table.innerHTML += `<tr><td>${row.city}</td><td>${row.sellOrder}</td><td>${row.profit}</td><td>${row.transportCities}</td></tr>`;
             });
         }
     </script>
