@@ -6,26 +6,36 @@
     <title>Albion Market Flipper</title>
     <script>
         async function fetchMarketData() {
-            const itemId = "T4_BAG"; // Exemplu, schimbă cu ce vrei
+            const itemId = document.getElementById("itemInput").value;
             const locations = ["Bridgewatch", "Martlock", "Lymhurst", "Thetford", "Fort Sterling"];
             
+            if (!itemId) {
+                alert("Please enter an item ID.");
+                return;
+            }
+            
             const url = `https://west.albion-online-data.com/api/v2/stats/prices/${itemId}.json`;
-            const response = await fetch(url);
-            const data = await response.json();
-            
-            const marketData = locations.map(city => {
-                const sellOrder = data.find(d => d.city === city && d.sell_price_min > 0);
-                const buyOrder = data.find(d => d.city === city && d.buy_price_max > 0);
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
                 
-                return {
-                    city,
-                    sellPrice: sellOrder ? sellOrder.sell_price_min : "N/A",
-                    buyPrice: buyOrder ? buyOrder.buy_price_max : "N/A",
-                    profit: sellOrder && buyOrder ? (sellOrder.sell_price_min * 0.975 - buyOrder.buy_price_max).toFixed(2) : "N/A"
-                };
-            });
-            
-            displayData(marketData);
+                const marketData = locations.map(city => {
+                    const sellOrder = data.find(d => d.city === city && d.sell_price_min > 0);
+                    const buyOrder = data.find(d => d.city === city && d.buy_price_max > 0);
+                    
+                    return {
+                        city,
+                        sellPrice: sellOrder ? sellOrder.sell_price_min : "N/A",
+                        buyPrice: buyOrder ? buyOrder.buy_price_max : "N/A",
+                        profit: sellOrder && buyOrder ? (sellOrder.sell_price_min * 0.975 - buyOrder.buy_price_max).toFixed(2) : "N/A"
+                    };
+                });
+                
+                displayData(marketData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                alert("Failed to fetch data. Check the item ID and try again.");
+            }
         }
         
         function displayData(data) {
@@ -35,12 +45,13 @@
                 table.innerHTML += `<tr><td>${row.city}</td><td>${row.buyPrice}</td><td>${row.sellPrice}</td><td>${row.profit}</td></tr>`;
             });
         }
-        
-        window.onload = fetchMarketData;
     </script>
 </head>
 <body>
     <h1>Albion Market Flipper</h1>
+    <label for="itemInput">Enter Item ID:</label>
+    <input type="text" id="itemInput" placeholder="e.g., T4_BAG">
+    <button onclick="fetchMarketData()">Get Prices</button>
     <table border="1" id="marketTable"></table>
 </body>
 </html>
