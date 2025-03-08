@@ -1,3 +1,14 @@
+document.addEventListener("DOMContentLoaded", function() {
+    const balls = document.getElementById("btn1");
+
+    if (balls) {
+        balls.addEventListener("click", fetchMarketData); // Legătura corectă a evenimentului
+    } else {
+        console.error("Button with id 'btn1' not found.");
+    }
+});
+
+
 async function fetchMarketData() {
     let itemId = document.getElementById("itemInput").value.trim();
     
