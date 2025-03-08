@@ -20,8 +20,6 @@ async function fetchMarketData() {
         for (const itemId of items) {
             const url = `https://www.albion-online-data.com/api/v2/stats/prices/${itemId}.json?locations=${locations.join(",")}`;
             
-            console.log(`Fetching data for: ${itemId}`); // Debugging: Show itemId
-
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
