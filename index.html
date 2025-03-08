@@ -22,34 +22,33 @@
                 }
                 const data = await response.json();
                 
-                let minSell = Infinity;
-                let maxSell = 0;
-                let minCity = "N/A";
-                let maxCity = "N/A";
-                
-                const marketData = locations.map(city => {
+                let minSell = Infinity, maxSell = 0;
+                let minCity = "N/A", maxCity = "N/A";
+                let marketData = [];
+
+                locations.forEach(city => {
                     const cityData = data.filter(d => d.city === city);
                     const sellOrders = cityData.filter(d => d.sell_price_min > 0);
                     
-                    if (sellOrders.length === 0) {
-                        return { city, sellOrder: "N/A" };
-                    }
-                    
-                    const cityMinSell = Math.min(...sellOrders.map(d => d.sell_price_min));
-                    
-                    // Caut cel mai mic preț global și unde e
-                    if (cityMinSell < minSell) {
-                        minSell = cityMinSell;
-                        minCity = city;
-                    }
-                    
-                    // Caut cel mai mare preț global și unde e
-                    if (cityMinSell > maxSell) {
-                        maxSell = cityMinSell;
-                        maxCity = city;
-                    }
+                    if (sellOrders.length > 0) {
+                        const cityMinSell = Math.min(...sellOrders.map(d => d.sell_price_min));
 
-                    return { city, sellOrder: cityMinSell };
+                        // Caut cel mai mic preț global și unde e
+                        if (cityMinSell < minSell) {
+                            minSell = cityMinSell;
+                            minCity = city;
+                        }
+
+                        // Caut cel mai mare preț global și unde e
+                        if (cityMinSell > maxSell) {
+                            maxSell = cityMinSell;
+                            maxCity = city;
+                        }
+
+                        marketData.push({ city, sellOrder: cityMinSell });
+                    } else {
+                        marketData.push({ city, sellOrder: "N/A" });
+                    }
                 });
 
                 const profit = maxSell > minSell ? (maxSell - minSell).toFixed(2) : "N/A";
@@ -68,7 +67,7 @@
                 table.innerHTML += `<tr><td>${row.city}</td><td>${row.sellOrder}</td></tr>`;
             });
 
-            if (profit !== "N/A") {
+            if (profit !== "N/A" && minCity !== maxCity) {
                 table.innerHTML += `<tr><th colspan="2">Best Transport Opportunity</th></tr>`;
                 table.innerHTML += `<tr><td>Buy From</td><td>${minCity} (${minSell})</td></tr>`;
                 table.innerHTML += `<tr><td>Sell To</td><td>${maxCity} (${maxSell})</td></tr>`;
