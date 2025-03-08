@@ -52,11 +52,13 @@
                 });
 
                 if (maxSell > minSell) {
-                    const finalSellPrice = maxSell * (1 - setupFee) * (1 - taxRate); // ✅ Aplicăm setup fee și taxă
+                    const sellAfterSetup = maxSell * (1 - setupFee); // ✅ Scădem taxa de setup 2.5%
+                    const finalSellPrice = sellAfterSetup * (1 - taxRate); // ✅ Aplicăm și taxa normală
                     const profit = (finalSellPrice - minSell).toFixed(2);
-                    displayData(marketData, profit, minCity, minSell, maxCity, maxSell, taxRate);
+
+                    displayData(marketData, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee);
                 } else {
-                    displayData(marketData, "N/A", minCity, minSell, maxCity, maxSell, taxRate);
+                    displayData(marketData, "N/A", minCity, minSell, maxCity, maxSell, taxRate, setupFee);
                 }
 
             } catch (error) {
@@ -65,7 +67,7 @@
             }
         }
         
-        function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate) {
+        function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
             const table = document.getElementById("marketTable");
             table.innerHTML = "<tr><th>City</th><th>Sell Order</th></tr>";
             data.forEach(row => {
@@ -76,7 +78,8 @@
                 table.innerHTML += `<tr><th colspan="2">Best Transport Opportunity</th></tr>`;
                 table.innerHTML += `<tr><td>Buy From</td><td>${minCity} (${minSell})</td></tr>`;
                 table.innerHTML += `<tr><td>Sell To</td><td>${maxCity} (${maxSell})</td></tr>`;
-                table.innerHTML += `<tr><td>Applied Tax</td><td>${(taxRate * 100).toFixed(0)}% + 2.5% setup fee</td></tr>`;
+                table.innerHTML += `<tr><td>Setup Fee</td><td>2.5%</td></tr>`;
+                table.innerHTML += `<tr><td>Tax Applied</td><td>${(taxRate * 100).toFixed(0)}%</td></tr>`;
                 table.innerHTML += `<tr><td>Profit</td><td>${profit}</td></tr>`;
             } else {
                 table.innerHTML += `<tr><td colspan="2">No profitable transport found</td></tr>`;
