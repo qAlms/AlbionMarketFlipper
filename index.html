@@ -17,6 +17,9 @@
             const url = `https://europe.albion-online-data.com/api/v2/stats/prices/${itemId}.json?locations=${locations.join(",")}`;
             try {
                 const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
                 const data = await response.json();
                 
                 const marketData = locations.map(city => {
