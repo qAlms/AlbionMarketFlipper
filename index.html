@@ -10,7 +10,7 @@
             
             // Înlocuim spațiile cu "_", pentru a ne asigura că itemele cu mai multe cuvinte sunt corect procesate
             itemId = itemId.replace(/ /g, "_");
-            
+
             if (!itemId) {
                 alert("⚠️ Please enter an item ID.");
                 return;
@@ -29,10 +29,10 @@
                 }
                 const data = await response.json();
 
-                console.log("🔍 API Response:", data); // ✅ DEBUGGING: Afișează datele în consolă
+                console.log("🔍 API Response:", data); // ✅ Debugging: Afișează datele în consolă
                 
                 if (data.length === 0) {
-                    alert(`⚠️ No market data found for ${itemId}. Try another item.`);
+                    alert(`⚠️ No market data found for item ID: ${itemId}. Try another item.`);
                     return;
                 }
 
@@ -43,6 +43,9 @@
                 locations.forEach(city => {
                     const cityData = data.filter(d => d.city === city);
                     const sellOrders = cityData.filter(d => d.sell_price_min > 0);
+
+                    // Debugging: Verificăm ce date obținem pentru fiecare oraș
+                    console.log(`Data for ${city}:`, cityData);
 
                     if (sellOrders.length > 0) {
                         const cityMinSell = Math.min(...sellOrders.map(d => d.sell_price_min));
@@ -119,3 +122,4 @@
     <table border="1" id="marketTable"></table>
 </body>
 </html>
+
