@@ -85,16 +85,6 @@ async function fetchMarketData() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    const balls = document.getElementById("btn1");
-    
-    if (balls) {
-        balls.addEventListener("click", fetchMarketData);
-    } else {
-        console.error("Button with id 'btn1' not found.");
-    }
-});
-
 balls.addEventListener("submit", fetchMarketData);
 
 function displayData(data, profit, minCity, minSell, maxCity, maxSell, taxRate, setupFee) {
